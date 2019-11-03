@@ -9,7 +9,7 @@
 namespace Rrclic\Service;
 
 use Rrclic\Library\Helper;
-use Rrclic\ServiceInterface\FormatOutput;
+use Rrclic\Contract\FormatOutput;
 
 class HtmlFormatOutput implements FormatOutput
 {

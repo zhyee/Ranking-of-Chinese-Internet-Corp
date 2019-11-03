@@ -9,6 +9,8 @@
 
 namespace Rrclic\Library;
 
+use Rrclic\Entity\CurlTask;
+
 class ConcurrentCurl
 {
     protected $mh;
@@ -18,67 +20,39 @@ class ConcurrentCurl
      */
     protected $maxConcurrency = 16;
 
-    /**
-     * @var int 最多重试次数
-     */
-    protected $maxTryCount = 3;
+    // 任务队列
+    protected $taskQueue;
 
-    protected $taskPoolCount = 0;
-
-    protected $successCallback;
-
-    protected $errorCallback;
-
-    protected $errorCounter = [];
-
-    protected $urls;
-
-    protected $urlsBack;
+    // 任务执行池
+    protected $taskPool;
 
     protected $initialized = false;
 
-    protected $curlPool = [];
-
-    protected $curlOpts = [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HEADER => false,
-        CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-    ];
-
-    public function __construct(array $urls)
+    public function __construct()
     {
-        $this->urls = $urls;
+        $this->taskQueue = new \SplQueue();
+        $this->taskPool = [];
     }
 
     /**
-     * 向url列表尾部追加新的单元
-     * @param $url
+     * 把任务添加到队列的尾部，任务将较晚执行
+     * @param CurlTask $task
      * @return $this
      */
-    public function appendUrl($url)
+    public function appendTask(CurlTask $task)
     {
-        if (is_string($url)) {
-            $url = [$url];
-        }
-        $this->urls = array_merge($this->urls, $url);
+        $this->taskQueue->push($task);
         return $this;
     }
 
     /**
-     * 向url列表头部追加新的单元
-     * @param $url
+     * 把任务添加到队列的头部，任务将优先执行
+     * @param CurlTask $task
      * @return $this
      */
-    public function prependUrl($url)
+    public function prependTask(CurlTask $task)
     {
-        if (is_string($url)) {
-            array_unshift($this->urls, $url);
-        } else {
-            foreach ($url as $value)
-            {
-                array_unshift($this->urls, $value);
-            }
-        }
+        $this->taskQueue->unshift($task);
         return $this;
     }
 
@@ -93,104 +67,58 @@ class ConcurrentCurl
         return $this;
     }
 
-    /**
-     * 设置请求失败时的最大重试次数，首次失败为1，依次类推
-     * @param $count
-     * @return $this
-     */
-    public function setMaxTryCount($count)
-    {
-        $this->maxTryCount = $count;
-        return $this;
-    }
-
-    /**
-     * 设置全局curl参数
-     * @param $opts
-     * @return $this
-     */
-    public function setCurlOpts($opts)
-    {
-        $this->curlOpts += $opts;
-        return $this;
-    }
-
-    /**
-     * 设置curl执行成功时的回调函数，函数参数是返回的http响应内容
-     * @param $callback
-     * @return $this
-     */
-    public function success($callback)
-    {
-        $this->successCallback = $callback;
-        return $this;
-    }
-
-    /**
-     * 设置curl执行失败时的回调函数，函数参数是curl错误码
-     * @param $callback
-     * @return $this
-     */
-    public function error($callback)
-    {
-        $this->errorCallback = $callback;
-        return $this;
-    }
-
     protected function init()
     {
         $this->mh = curl_multi_init();
-        $this->addCurlTask();
+        $this->addTaskToPool();
         $this->initialized = true;
     }
 
-    protected function addCurlTask()
+    protected function addTaskToPool()
     {
-        $count = 0;
-        while (count($this->urls) && $this->taskPoolCount < $this->maxConcurrency) {
-            $url = array_shift($this->urls);
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            if ($this->curlOpts) {
-                curl_setopt_array($ch, $this->curlOpts);
+        while (!$this->taskQueue->isEmpty() && count($this->taskPool) < $this->maxConcurrency) {
+            /** @var CurlTask $task */
+            $task = $this->taskQueue->shift();
+            if ($task->isCanRun()) {
+                $curl = $task->getCurlHandler();
+                if (!isset($this->taskPool[(int)$curl]) || !$this->taskPool[(int)$curl] instanceof \SplQueue) {
+                    $this->taskPool[(int)$curl] = new \SplQueue();
+                    curl_multi_add_handle($this->mh, $curl);
+                }
+                //关联相同curl句柄的任务
+                $this->taskPool[(int)$curl]->enqueue($task);
+            } else {
+                $task->error('task无法运行，请确认是否设置了curl句柄');
             }
-            curl_multi_add_handle($this->mh, $ch);
-            $this->curlPool[(int)$ch] = $url;
-            $this->taskPoolCount++;
-            $count ++;
         }
-        return $count;
     }
 
     protected function processCurlResult($info)
     {
-        $ch = $info['handle'];
-        $url = $this->curlPool[(int)$ch];
-        if ($info['result'] !== CURLE_OK) {
-            if (isset($this->errorCounter[$url])) {
-                $this->errorCounter[$url]++;
+        $curl = $info['handle'];
+        while (!$this->taskPool[(int)$curl]->isEmpty()) {
+            /** @var CurlTask $task */
+            $task = $this->taskPool[(int)$curl]->dequeue();
+            if ($info['result'] !== CURLE_OK) {
+                if ($task->incrFailCount() < $task->getMaxRetryCount()) {
+                    $this->appendTask($task);
+                } else {
+                    $task->error(sprintf('任务：%s失败次数已达%d次', $task->getId(), $task->getMaxRetryCount()));
+                }
             } else {
-                $this->errorCounter[$url] = 1;
+                $task->success();
             }
-            if ($this->errorCounter[$url] < $this->maxTryCount) {
-                $this->prependUrl($url);
-            }
-            call_user_func($this->errorCallback, $info['result'], $ch);
-        } else {
-            $html = curl_multi_getcontent($ch);
-            call_user_func($this->successCallback, $html, $ch);
         }
-        curl_multi_remove_handle($this->mh, $ch);
-        unset($this->curlPool[(int)$ch]);
-        $this->taskPoolCount--;
+        curl_multi_remove_handle($this->mh, $curl);
+        unset($this->taskPool[(int)$curl]);
     }
 
-    public function run()
+    public function bootstrap()
     {
         $this->init();
         do {
             curl_multi_exec($this->mh, $remainTaskCount);
-            if ($remainTaskCount < $this->taskPoolCount) {
+            if ($remainTaskCount < count($this->taskPool)) {
                 do {
                     $info = curl_multi_info_read($this->mh, $remainMsgCount);
                     if ($info) {
@@ -198,11 +126,11 @@ class ConcurrentCurl
                     }
                 } while ($remainMsgCount);
 
-                $this->addCurlTask();
+                $this->addTaskToPool();
             }
             curl_multi_select($this->mh);
 
-        } while ($this->taskPoolCount > 0);
+        } while (count($this->taskPool) > 0);
         curl_multi_close($this->mh);
     }
 }

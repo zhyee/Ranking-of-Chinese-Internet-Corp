@@ -10,26 +10,17 @@ namespace Rrclic\Service;
 
 use QL\QueryList;
 use Rrclic\Library\BaseClass;
-use Rrclic\ServiceInterface\MoneyExchange;
+use Rrclic\Contract\MoneyExchange;
 
 class MoneyExchangeFromSina extends BaseClass implements MoneyExchange
 {
-    // 人民币
-    const MONEY_RMB = 'cny';
-
-    // 美元
-    const MONEY_USD = 'usd';
-
-    // 港元
-    const MONEY_HKD = 'hkd';
-
     // 查询汇率url
     const url = 'https://hq.sinajs.cn/rn={timestamp}list=fx_s{from}{to}';
 
-    const SUPPORT_CURRENCIES = [
-        self::MONEY_RMB,
-        self::MONEY_USD,
-        self::MONEY_HKD,
+    const CURRENCY_EN_NAMES = [
+        MoneyExchange::MONEY_RMB => 'cny',
+        MoneyExchange::MONEY_USD => 'usd',
+        MoneyExchange::MONEY_HKD => 'hkd',
     ];
 
 
@@ -41,18 +32,18 @@ class MoneyExchangeFromSina extends BaseClass implements MoneyExchange
      */
     public function getExchangeRate($from, $to)
     {
-        if (!in_array($from, self::SUPPORT_CURRENCIES) || !in_array($to, self::SUPPORT_CURRENCIES)) {
+        if (!in_array($from, MoneyExchange::SUPPORT_CURRENCIES) || !in_array($to, MoneyExchange::SUPPORT_CURRENCIES)) {
             throw new \InvalidArgumentException('bad arguments!');
         }
         static $res = [];
-        $exchange = $from . $to;
+        $exchange = $from . '->' . $to;
         if (isset($res[$exchange])) {
             return $res[$exchange];
         }
 
         $timestamp = (int)(microtime(true) * 1000);
 
-        $url = str_replace(['{timestamp}', '{from}', '{to}'], [$timestamp, $from, $to], self::url);
+        $url = str_replace(['{timestamp}', '{from}', '{to}'], [$timestamp, self::CURRENCY_EN_NAMES[$from], self::CURRENCY_EN_NAMES[$to]], self::url);
 
         $ql = QueryList::getInstance()->get($url);
 
@@ -72,45 +63,5 @@ class MoneyExchangeFromSina extends BaseClass implements MoneyExchange
     {
         $rate = $this->getExchangeRate($from, $to);
         return bcmul($value, $rate, 2);
-    }
-
-    /**
-     * 人民币转换美元
-     * @param $value
-     * @return string
-     */
-    public function rmb2usd($value)
-    {
-        return $this->exchange(self::MONEY_RMB, self::MONEY_USD, $value);
-    }
-
-    /**
-     * 港币转换美元
-     * @param $value
-     * @return string
-     */
-    public function hkd2usd($value)
-    {
-        return $this->exchange(self::MONEY_HKD, self::MONEY_USD, $value);
-    }
-
-    /**
-     * 美元转换人民币
-     * @param $value
-     * @return string
-     */
-    public function usd2rmb($value)
-    {
-        return $this->exchange(self::MONEY_USD, self::MONEY_RMB, $value);
-    }
-
-    /**
-     * 港币兑换人民币
-     * @param $value
-     * @return string
-     */
-    public function hkd2rmb($value)
-    {
-        return $this->exchange(self::MONEY_HKD, self::MONEY_RMB, $value);
     }
 }

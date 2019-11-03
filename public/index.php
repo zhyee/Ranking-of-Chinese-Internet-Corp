@@ -15,11 +15,11 @@ use Monolog\Handler\StreamHandler;
 use Rrclic\App;
 use Rrclic\Service\ConsoleFormatOutput;
 use Rrclic\Service\HtmlFormatOutput;
-use Rrclic\Service\marketCapFromBaidu;
+use Rrclic\Service\marketValueFromBaidu;
 use Rrclic\Service\MoneyExchangeFromSina;
-use Rrclic\ServiceInterface\FormatOutput;
-use Rrclic\ServiceInterface\MarketCap;
-use Rrclic\ServiceInterface\MoneyExchange;
+use Rrclic\Contract\FormatOutput;
+use Rrclic\Contract\MarketValue;
+use Rrclic\Contract\MoneyExchange;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -41,7 +41,7 @@ $builder->addDefinitions(
             $logger->pushHandler($handler);
             return $logger;
         }),
-        MarketCap::class => DI\create(marketCapFromBaidu::class),
+        MarketValue::class => DI\create(marketValueFromBaidu::class),
         MoneyExchange::class => DI\create(MoneyExchangeFromSina::class),
     ]
 );
@@ -62,33 +62,8 @@ if (PHP_SAPI === 'cli') {
 
 $container = $builder->build();
 
-$container->set('foo', 'bar');
-$container->set('myInterface', \DI\create('myClass'));
-$container->set('myClosure', \DI\value(function (){}));
-
 App::setContainer($container);
 $app = $container->get(App::class);
 $app->run();
 
-//$sources = [
-//    'baidu' => \Rrclic\Service\marketCapFromBaidu::class,
-//    'sina' => \Rrclic\Service\MarketCapFromSina::class,
-//    'eastmoney' => \Rrclic\Service\MarketCapFromEastMoney::class,
-//];
-//
-//
-//
-//
-//foreach ($sources as $source) {
-//    /** @var \Rrclic\ServiceInterface\MarketCap $handler */
-//    $handler = new $source();
-//    $handler->getTotalMarketCap($companies);
-//    $marketValues = $handler->getSortedMarketValues();
-//    if ($marketValues) {
-//        break;
-//    }
-//}
-//
-//$output = new \Rrclic\Service\HtmlFormatOutput();
-//$output->formatOut($marketValues, __DIR__ . '/index.html');
 

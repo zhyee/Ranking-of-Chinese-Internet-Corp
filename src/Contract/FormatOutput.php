@@ -6,9 +6,9 @@
  * Time: 10:01
  */
 
-namespace Rrclic\ServiceInterface;
+namespace Rrclic\Contract;
 
 interface FormatOutput
 {
-    public function formatOut(array $data, $file = null);
+    public function formatOut(array $data, $unit = MoneyExchange::MONEY_USD, $file = null);
 }

@@ -10,8 +10,9 @@ namespace Rrclic;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Rrclic\ServiceInterface\FormatOutput;
-use Rrclic\ServiceInterface\MarketCap;
+use Rrclic\Contract\FormatOutput;
+use Rrclic\Contract\MarketValue;
+use Rrclic\Contract\MoneyExchange;
 
 class App
 {
@@ -35,12 +36,12 @@ class App
 
     /**
      * App constructor.
-     * @param MarketCap $marketCap
+     * @param MarketValue $marketCap
      * @param FormatOutput $formatOutput
      * @param LoggerInterface $logger
      * @throws \Exception
      */
-    public function __construct(MarketCap $marketCap, FormatOutput $formatOutput, LoggerInterface $logger)
+    public function __construct(MarketValue $marketCap, FormatOutput $formatOutput, LoggerInterface $logger)
     {
         $this->marketCap = $marketCap;
 
@@ -57,9 +58,7 @@ class App
         }
 
         $companies = self::$container->get('config')['companies'];
-
-        $this->marketCap->getTotalMarketCap($companies);
-        $marketValues = $this->marketCap->getSortedMarketValues();
-        $this->formatOutput->formatOut($marketValues);
+        $marketValues = $this->marketCap->getSortedMarketValues($companies, MoneyExchange::MONEY_USD);
+        $this->formatOutput->formatOut($marketValues, MoneyExchange::MONEY_USD);
     }
 }
