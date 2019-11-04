@@ -1,17 +1,20 @@
 ## 实时抓取中国上市互联网公司市值和其排名
 
-- **安装**
+#### 安装
 ```bash
-#克隆本项目
-git clone https://github.com/zhyee/Ranking-of-Chinese-Internet-Corp.git
+composer create-project zhyee/rrclic rrclic
 
-#composer安装
-cd Ranking-of-Chinese-Internet-Corp
-composer install
+#如果安装速度过慢，请替换阿里云composer镜像
+composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 ```
 
-- **使用**
+#### 使用
+
+- 命令行模式
 ```bash
+#进入项目目录
+cd rrclic
+
 php public/index.php
 ```
 
@@ -109,3 +112,15 @@ php public/index.php
 90. 第九城市：0.43亿美元
 91. 和信贷：0.32亿美元
 ```
+
+- 网页模式
+
+```bash
+#进入项目目录
+cd rrclic/public
+
+#启动php内置服务器
+php -S localhost:8000
+```
+
+浏览器访问：http://localhost:8000/index.php
