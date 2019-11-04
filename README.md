@@ -124,3 +124,7 @@ php -S localhost:8000
 ```
 
 浏览器访问：http://localhost:8000/index.php
+
+页面会输出类似表格：
+
+![html.png](public/html.png)

@@ -8,12 +8,13 @@
 
 namespace Rrclic\Service;
 
+use Rrclic\Contract\MoneyExchange;
 use Rrclic\Library\Helper;
 use Rrclic\Contract\FormatOutput;
 
 class HtmlFormatOutput implements FormatOutput
 {
-    public function formatOut(array $data, $file = null)
+    public function formatOut(array $data, $unit = MoneyExchange::MONEY_USD, $file = null)
     {
         ob_start();
         echo <<<EOT
@@ -27,7 +28,7 @@ class HtmlFormatOutput implements FormatOutput
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   </head>
   <body>
-    <div class="container">
+    <div class="container" style="margin-top:60px;margin-bottom: 40px;">
     <table class="table table-hover table-bordered">
     <thead>
     <tr><th class="text-center">排名</th><th class="text-center">公司</th><th class="text-center">市值（单位：亿美元）</th></tr>
