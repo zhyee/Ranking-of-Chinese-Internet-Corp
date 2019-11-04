@@ -6,11 +6,11 @@
         "internet"
     ],
     "type": "project",
-    "license": "MIT",
+    "license": "GPLv2",
     "authors": [
         {
             "name": "zhyee",
-            "email": "coder.zhangyi@qq.com"
+            "email": "zhangyi04@bilibili.com"
         }
     ],
     "require": {
@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Rrclic\\": "src"
+            "Rrclic\\": "src/"
         }
     }
 }
