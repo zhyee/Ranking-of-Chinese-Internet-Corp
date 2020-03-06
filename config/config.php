@@ -4,6 +4,7 @@
  */
 
 use Monolog\Logger;
+use Rrclic\Service\MarketValueFromEastMoney;
 
 return [
     'displayErrorDetails' => true, // Should be set to false in production
@@ -13,17 +14,42 @@ return [
         'level' => Logger::DEBUG,
     ],
     'companies' => [
-        '腾讯',
-        '阿里巴巴',
-        '美团',
-        '京东',
-        '百度',
-        '网易',
-        '腾讯音乐',
-        '阅文集团',
-        '新浪',
-        '微博',
-        '搜狐',
+        '腾讯控股' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=116.00700&fields=f58,f116,f172'
+        ],
+        '腾讯音乐' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=106.TME&fields=f58,f116,f172'
+        ],
+        '阿里巴巴' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=106.BABA&fields=f58,f116,f172'
+        ],
+        '美团点评' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=116.03690&fields=f58,f116,f172'
+        ],
+        '京东' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.JD&fields=f58,f116,f172'
+        ],
+        '百度' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.BIDU&fields=f58,f116,f172'
+        ],
+        '网易' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.NTES&fields=f58,f116,f172'
+        ],
+        '网易有道' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=106.DAO&fields=f58,f116,f172'
+        ],
+        '阅文集团' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=116.00772&fields=f58,f116,f172'
+        ],
+        '新浪' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.SINA&fields=f58,f116,f172'
+        ],
+        '微博' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.WB&fields=f58,f116,f172'
+        ],
+        '搜狐' => [
+            MarketValueFromEastMoney::class => 'http://push2.eastmoney.com/api/qt/stock/get?secid=105.SOHU&fields=f58,f116,f172'
+        ],
         '搜狗',
         '哔哩哔哩',
         '拼多多',
@@ -103,7 +129,6 @@ return [
         '流利说',
         '360金融',
         '鲁大师',
-        '网易有道',
         '金山办公',
     ],
 ];
