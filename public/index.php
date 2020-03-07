@@ -15,7 +15,7 @@ use Monolog\Handler\StreamHandler;
 use Rrclic\App;
 use Rrclic\Service\ConsoleFormatOutput;
 use Rrclic\Service\HtmlFormatOutput;
-use Rrclic\Service\marketValueFromBaidu;
+use Rrclic\Service\MarketValueFromEastMoney;
 use Rrclic\Service\MoneyExchangeFromSina;
 use Rrclic\Contract\FormatOutput;
 use Rrclic\Contract\MarketValue;
@@ -41,7 +41,7 @@ $builder->addDefinitions(
             $logger->pushHandler($handler);
             return $logger;
         }),
-        MarketValue::class => DI\create(marketValueFromBaidu::class),
+        MarketValue::class => DI\create(MarketValueFromEastMoney::class),
         MoneyExchange::class => DI\create(MoneyExchangeFromSina::class),
     ]
 );

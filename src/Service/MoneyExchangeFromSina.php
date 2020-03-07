@@ -61,7 +61,11 @@ class MoneyExchangeFromSina extends BaseClass implements MoneyExchange
      */
     public function exchange($from, $to, $value)
     {
-        $rate = $this->getExchangeRate($from, $to);
+        if ($from == $to) {
+            $rate = 1;
+        } else {
+            $rate = $this->getExchangeRate($from, $to);
+        }
         return bcmul($value, $rate, 2);
     }
 }

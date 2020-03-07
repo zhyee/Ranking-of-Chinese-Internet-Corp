@@ -10,5 +10,5 @@ namespace Rrclic\Contract;
 
 interface MarketValue
 {
-    public function getSortedMarketValues($corpNameLists, $unit = MoneyExchange::MONEY_USD);
+    public function getSortedMarketValues($corpNameLists, $toMoneyUnit = MoneyExchange::MONEY_USD);
 }

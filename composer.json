@@ -19,7 +19,8 @@
         "ext-bcmath": "*",
         "jaeger/querylist": "^4.1",
         "php-di/php-di": "^6.0",
-        "monolog/monolog": "^1."
+        "monolog/monolog": "^1.",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {

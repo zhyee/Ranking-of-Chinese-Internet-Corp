@@ -14,7 +14,7 @@ use Rrclic\Contract\MoneyExchange;
 
 class MarketValueFromSina extends BaseClass implements MarketValue
 {
-    public function getSortedMarketValues($corpNameLists, $unit = MoneyExchange::MONEY_USD)
+    public function getSortedMarketValues($corpNameLists, $toMoneyUnit = MoneyExchange::MONEY_USD)
     {
         // TODO: Implement getTotalMarketCap() method.
     }
