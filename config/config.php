@@ -14,6 +14,7 @@ return [
         'level' => Logger::DEBUG,
     ],
     'companies' => [
+        '金山云',
         '小米集团',
         '阿里健康',
         '腾讯控股',
