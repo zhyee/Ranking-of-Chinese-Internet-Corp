@@ -58,7 +58,7 @@ class App
         }
 
         $companies = self::$container->get('config')['companies'];
-        $marketValues = $this->marketCap->getSortedMarketValues($companies, MoneyExchange::MONEY_USD);
-        $this->formatOutput->formatOut($marketValues, MoneyExchange::MONEY_USD);
+        $marketValues = $this->marketCap->getSortedMarketValues($companies, MoneyExchange::MONEY_RMB);
+        $this->formatOutput->formatOut($marketValues, MoneyExchange::MONEY_RMB);
     }
 }

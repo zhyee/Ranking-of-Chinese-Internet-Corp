@@ -95,7 +95,9 @@ class MarketValueFromEastMoney extends BaseClass implements MarketValue
                                 $market = $body['data']['f116'];
                                 $valueUnit = $body['data']['f172'];
                                 $fromMoneyUnit = isset(self::MONEY_UNIT_MAP[$valueUnit]) ? self::MONEY_UNIT_MAP[$valueUnit] : MoneyExchange::MONEY_RMB;
-                                $this->marketValues[$corpName] = MoneyExchangeFromSina::getInstance()->exchange($fromMoneyUnit, $toMoneyUnit, $market);
+                                $this->marketValues[$corpName][MoneyExchange::MONEY_RMB] = MoneyExchangeFromSina::getInstance()->exchange($fromMoneyUnit, MoneyExchange::MONEY_RMB, $market);
+                                $this->marketValues[$corpName][MoneyExchange::MONEY_USD] = MoneyExchangeFromSina::getInstance()->exchange($fromMoneyUnit, MoneyExchange::MONEY_USD, $market);
+                                $this->marketValues[$corpName][MoneyExchange::MONEY_HKD] = MoneyExchangeFromSina::getInstance()->exchange($fromMoneyUnit, MoneyExchange::MONEY_HKD, $market);
                                 return;
                             }
                             echo $corpName . '>>>>>查询市值失败' . PHP_EOL;

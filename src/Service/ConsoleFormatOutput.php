@@ -19,7 +19,9 @@ class ConsoleFormatOutput implements FormatOutput
         ob_start();
         $i = 0;
         foreach ($data as $name => $value) {
-            echo (++$i) . '. ' . $name . "：" . bcdiv($value, 100000000, 2) . '亿' . MoneyExchange::CURRENCY_NAMES[$unit] . PHP_EOL;
+            echo str_pad(++$i, 2, '0', STR_PAD_LEFT) . '. ' . $name . "\t\t" . bcdiv($value[MoneyExchange::MONEY_USD], 100000000, 2) . '亿' . MoneyExchange::CURRENCY_NAMES[MoneyExchange::MONEY_USD]
+                .  "\t\t" . bcdiv($value[MoneyExchange::MONEY_RMB], 100000000, 2) . '亿' . MoneyExchange::CURRENCY_NAMES[MoneyExchange::MONEY_RMB]
+                .  "\t\t" . bcdiv($value[MoneyExchange::MONEY_HKD], 100000000, 2) . '亿' . MoneyExchange::CURRENCY_NAMES[MoneyExchange::MONEY_HKD] . PHP_EOL;
         }
         $output = ob_get_clean();
 
