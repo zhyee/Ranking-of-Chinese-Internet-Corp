@@ -10,6 +10,7 @@ composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
   或者
 ```bash
   git clone https://github.com/zhyee/Ranking-of-Chinese-Internet-Corp.git rrclic
+  cd rrclic && composer install
 ```
 
 #### 使用
