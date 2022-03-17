@@ -45,7 +45,11 @@ class MoneyExchangeFromSina extends BaseClass implements MoneyExchange
 
         $url = str_replace(['{timestamp}', '{from}', '{to}'], [$timestamp, self::CURRENCY_EN_NAMES[$from], self::CURRENCY_EN_NAMES[$to]], self::url);
 
-        $ql = QueryList::getInstance()->get($url);
+        $ql = QueryList::getInstance()->get($url, [],   ['headers' => [
+        'Referer' => 'https://finance.sina.com.cn/money/forex/hq/CNYHKD.shtml'
+        ]]);
+
+        // "Referer", "https://finance.sina.com.cn/money/forex/hq/CNYHKD.shtml"
 
         $html = $ql->getHtml();
         $arr = explode(',', $html);

@@ -21,15 +21,17 @@ use Rrclic\Contract\FormatOutput;
 use Rrclic\Contract\MarketValue;
 use Rrclic\Contract\MoneyExchange;
 
-require __DIR__ . '/../vendor/autoload.php';
+const APP_PATH = __DIR__;
+
+require APP_PATH . '/vendor/autoload.php';
 
 
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions(
     [
-        'config' => require __DIR__ . '/../config/config.php',
-        'database' => require __DIR__ . '/../config/database.php',
+        'config' => require APP_PATH . '/config/config.php',
+        'database' => require APP_PATH . '/config/database.php',
         LoggerInterface::class => DI\factory(function (ContainerInterface $c) {
             $loggerSetting = $c->get('config')['logger'];
             $logger = new Logger($loggerSetting['name']);
