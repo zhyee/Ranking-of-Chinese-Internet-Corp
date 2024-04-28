@@ -20,11 +20,15 @@
         "jaeger/querylist": "^4.1",
         "php-di/php-di": "^6.0",
         "monolog/monolog": "^1.",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-http": "*"
     },
     "autoload": {
         "psr-4": {
             "Rrclic\\": "src/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
     }
 }
